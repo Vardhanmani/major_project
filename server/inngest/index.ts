@@ -7,6 +7,7 @@ const LOW_STOCK_THRESHOLD =10;
 export const inngest = new Inngest({ 
   id: "shop_fusion",
   apiKey: process.env.INNGEST_EVENT_KEY,
+  signingKey: process.env.INNGEST_SIGNING_KEY,
 });
 // low stock alert to Admin Email
 const checkLowStock = inngest.createFunction(

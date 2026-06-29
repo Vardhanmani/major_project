@@ -13,6 +13,7 @@ const app = express();
 // Middleware
 app.use(cors())
 app.use(express.json());
+app.use(express.raw({ type: "application/octet-stream" }));
 
 const port = process.env.PORT || 5000;
 
@@ -24,7 +25,18 @@ app.use('/api/auth',authRouter);
 app.use('/api/product',productRouter);
 app.use('/api/upload',uploadRouter);
 app.use('/api/orders',orderRouter);
-app.use("/api/inngest", serve({ client: inngest, functions }));
+
+// Inngest endpoint with error handling
+app.use("/api/inngest", (req: Request, res: Response, next: NextFunction) => {
+  if (!process.env.INNGEST_EVENT_KEY || !process.env.INNGEST_SIGNING_KEY) {
+    return res.status(500).json({ 
+      message: "Inngest environment variables not configured",
+      hasEventKey: !!process.env.INNGEST_EVENT_KEY,
+      hasSigningKey: !!process.env.INNGEST_SIGNING_KEY
+    });
+  }
+  serve({ client: inngest, functions })(req, res, next);
+});
 
 
 //Global error handling
