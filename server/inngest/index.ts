@@ -4,10 +4,8 @@ import sendEmail from "../config/nodemalier.js";
 const LOW_STOCK_THRESHOLD =10;
 
 // Create a client to send and receive events
-export const inngest = new Inngest({ 
+export const inngest = new Inngest({
   id: "shop_fusion",
-  apiKey: process.env.INNGEST_EVENT_KEY,
-  signingKey: process.env.INNGEST_SIGNING_KEY,
 });
 // low stock alert to Admin Email
 const checkLowStock = inngest.createFunction(

@@ -14,22 +14,7 @@ const app = express();
 app.use(cors());
 
 // Inngest endpoint BEFORE body parsers (needs raw body for signature verification)
-app.use("/api/inngest", (req: Request, res: Response, next: NextFunction) => {
-  try {
-    if (!process.env.INNGEST_EVENT_KEY || !process.env.INNGEST_SIGNING_KEY) {
-      console.error("Inngest environment variables missing");
-      return res.status(500).json({ 
-        message: "Inngest not configured",
-        hasEventKey: !!process.env.INNGEST_EVENT_KEY,
-        hasSigningKey: !!process.env.INNGEST_SIGNING_KEY
-      });
-    }
-    return serve({ client: inngest, functions })(req, res, next);
-  } catch (error: any) {
-    console.error("Inngest error:", error);
-    res.status(500).json({ message: error.message, stack: error.stack });
-  }
-});
+app.use("/api/inngest", serve({ client: inngest, functions }));
 
 // Body parsers for other routes
 app.use(express.json());
