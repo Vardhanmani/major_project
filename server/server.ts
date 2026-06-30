@@ -13,14 +13,28 @@ const app = express();
 // Middleware - CORS first
 app.use(cors());
 
-// Inngest endpoint BEFORE body parsers (needs raw body for signature verification)
-app.use("/api/inngest", serve({ client: inngest, functions }));
-
-// Body parsers for other routes
+// Body parsers for all routes
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const port = process.env.PORT || 5000;
+
+// Inngest endpoint
+app.use("/api/inngest", (req, res, next) => {
+    if (!process.env.INNGEST_EVENT_KEY) {
+        return res.status(500).json({
+            message: "Missing INNGEST_EVENT_KEY. Set INNGEST_EVENT_KEY and INNGEST_SIGNING_KEY in production.",
+        });
+    }
+
+    if (!process.env.INNGEST_SIGNING_KEY && process.env.INNGEST_DEV !== "1") {
+        return res.status(500).json({
+            message: "Inngest cloud mode requires INNGEST_SIGNING_KEY. For local development, set INNGEST_DEV=1.",
+        });
+    }
+
+    serve({ client: inngest, functions })(req, res, next);
+});
 
 app.get('/', (req: Request, res: Response) => {
     res.send('Server is Live!');
