@@ -7,7 +7,7 @@ export const inngest = new Inngest({
     id: "shop_fusion",
 });
 // low stock alert to Admin Email
-const checkLowStock = inngest.createFunction({ id: "check-low-stock", name: "Low Stock Alert", triggers: [{ event: "inventory/stock.updated" }] }, async ({ event, step }) => {
+const checkLowStock = inngest.createFunction({ id: "check-low-stock", name: "Low Stack Alert", triggers: [{ event: "inventory/stock.update" }] }, async ({ event, step }) => {
     const { productId } = event.data;
     const product = await step.run("fetch-product", async () => {
         return await prisma.product.findUnique({

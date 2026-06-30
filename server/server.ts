@@ -1,4 +1,6 @@
 import "dotenv/config";
+import path from "path";
+import { fileURLToPath } from "url";
 import express, { NextFunction, Request, Response } from 'express';
 import cors from "cors";
 import authRouter from "./routes/authRoute.js";
@@ -8,10 +10,17 @@ import orderRouter from "./routes/orderRoutes.js";
 import { serve } from "inngest/express";
 import { inngest, functions } from "./inngest/index.js"
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const publicDir = path.join(__dirname, "../clint/public");
+
 const app = express();
 
 // Middleware - CORS first
 app.use(cors());
+
+// Static assets
+app.use(express.static(publicDir));
 
 // Body parsers for all routes
 app.use(express.json());
@@ -38,6 +47,10 @@ app.use("/api/inngest", (req, res, next) => {
 
 app.get('/', (req: Request, res: Response) => {
     res.send('Server is Live!');
+});
+
+app.get('/favicon.png', (req: Request, res: Response) => {
+    res.sendFile(path.join(publicDir, 'favicon.svg'));
 });
 
 app.use('/api/auth',authRouter);
